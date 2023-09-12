@@ -2,41 +2,38 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\API\BaseController as BaseController;
+use App\Http\Controllers\Api\BaseController as BaseController;
 use Illuminate\Http\Request;
 use App\Http\Resources\ProductResource;
-use Illuminate\Http\JsonResponse;
 use App\Models\Product;
 use Illuminate\Support\Facades\Validator;
 
 class ProductController extends BaseController
 {
-    public function index(): JsonResponse
+    public function index()
     {
         $products = Product::all();
 
         return $this->sendResponse(ProductResource::collection($products), 'Products retrieved successfully.');
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(Request $request)
     {
-        $input = $request->all();
-
-        $validator = Validator::make($input, [
-            'name' => 'required',
-            'detail' => 'required'
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'detail' => 'required|string',
         ]);
 
         if($validator->fails()){
             return $this->sendError('Validation Error.', $validator->errors());
         }
 
-        $product = Product::create($input);
+        $product = Product::create($request->all());
 
         return $this->sendResponse(new ProductResource($product), 'Product created successfully.');
     }
 
-    public function show($id): JsonResponse
+    public function show($id)
     {
         $product = Product::find($id);
 
@@ -47,27 +44,25 @@ class ProductController extends BaseController
         return $this->sendResponse(new ProductResource($product), 'Product retrieved successfully.');
     }
 
-    public function update(Request $request, Product $product): JsonResponse
+    public function update(Request $request, Product $product)
     {
-        $input = $request->all();
-
-        $validator = Validator::make($input, [
-            'name' => 'required',
-            'detail' => 'required'
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'detail' => 'required|string',
         ]);
 
         if($validator->fails()){
             return $this->sendError('Validation Error.', $validator->errors());
         }
 
-        $product->name = $input['name'];
-        $product->detail = $input['detail'];
+        $product->name = $request->name;
+        $product->detail = $request->detail;
         $product->save();
 
         return $this->sendResponse(new ProductResource($product), 'Product updated successfully.');
     }
 
-    public function destroy(Product $product): JsonResponse
+    public function destroy(Product $product)
     {
         $product->delete();
 
