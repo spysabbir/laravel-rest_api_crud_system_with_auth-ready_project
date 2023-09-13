@@ -21,7 +21,7 @@ class ProductController extends BaseController
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'detail' => 'required|string',
+            'detail' => 'required',
         ]);
 
         if($validator->fails()){
@@ -41,23 +41,21 @@ class ProductController extends BaseController
             return $this->sendError('Product not found.');
         }
 
-        return $this->sendResponse(new ProductResource($product), 'Product retrieved successfully.');
+        return $this->sendResponse(new ProductResource($product), 'Product retrieved.');
     }
 
     public function update(Request $request, Product $product)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'detail' => 'required|string',
+            'detail' => 'required',
         ]);
 
         if($validator->fails()){
             return $this->sendError('Validation Error.', $validator->errors());
         }
 
-        $product->name = $request->name;
-        $product->detail = $request->detail;
-        $product->save();
+        $product->update($request->all());
 
         return $this->sendResponse(new ProductResource($product), 'Product updated successfully.');
     }
@@ -66,6 +64,6 @@ class ProductController extends BaseController
     {
         $product->delete();
 
-        return $this->sendResponse([], 'Product deleted successfully.');
+        return $this->sendResponse([], 'Product deleted.');
     }
 }

@@ -61,6 +61,7 @@ class AuthController extends BaseController
 
     public function logout() {
         Auth::user()->tokens()->delete();
+        
         return $this->sendResponse([], 'User Logout.');
     }
 }
